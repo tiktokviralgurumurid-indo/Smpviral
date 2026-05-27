@@ -25,17 +25,17 @@
             width: 90%;
             border: 1px solid #2f2f2f;
         }
-        /* Gaya Tulisan Logo di Atas */
-        .site-logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-            display: inline-block;
+        /* Kontainer khusus untuk logo gambar agar rapi */
+        .logo-container {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .site-logo span {
-            color: #ff8c00; /* Warna jingga khas untuk aksen akhiran .com */
+        .logo-img {
+            max-width: 220px; /* Ukuran lebar logo proporsional */
+            height: auto;
+            display: block;
         }
         h3 {
             font-size: 22px;
@@ -105,8 +105,10 @@
 <body>
 
 <div class="container">
-    <!-- Bagian Tulisan Logo Paling Atas -->
-    <div class="site-logo">xhamster<span>.com</span></div>
+    <!-- Bagian Logo Gambar Sesuai Contoh -->
+    <div class="logo-container">
+        <img src="https://wikimedia.org" alt="Logo" class="logo-img">
+    </div>
 
     <div id="setup-box">
         <h3>Verifikasi Akses Pengguna</h3>
